@@ -96,7 +96,7 @@ POST /sacar/{valor}
 
 * Extrato bancário
 * Depósito
-* Transferências
+* Tranferencias 
 * Sistema de usuários
 * Integração com banco de dados
 
