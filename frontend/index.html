@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caixa Eletrônico</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      width: 360px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+    .header {
+      background: #ec0000;
+      padding: 24px;
+      color: #fff;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+    }
+    .content { padding: 24px; }
+    h3 { margin-bottom: 8px; color: #333; }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #ec0000;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+    button:hover { background: #c80000; }
+    .resultado {
+      background: #f0f0f0;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #444;
+      margin-bottom: 24px;
+    }
+    hr {
+      border: none;
+      height: 1px;
+      background: #ddd;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">Caixa Eletrônico</div>
+    <div class="content">
+
+      <h3>Login</h3>
+      <input id="pin" type="password" placeholder="Digite seu PIN" />
+      <button onclick="login()">Entrar</button>
+      <div id="loginResultado" class="resultado"></div>
+
+      <hr />
+
+      <h3>Consultar Saldo</h3>
+      <button onclick="consultarSaldo()">Ver Saldo</button>
+      <div id="saldoResultado" class="resultado"></div>
+
+      <hr />
+
+      <h3>Sacar</h3>
+      <input id="valorSaque" type="number" placeholder="Valor do saque" />
+      <button onclick="sacar()">Sacar</button>
+      <div id="saqueResultado" class="resultado"></div>
+
+    </div>
+  </div>
+
+<script>
+// Para testes em ambiente sem internet, ativamos um modo simulado.
+// Troque para false quando estiver rodando com sua API real.
+const MODO_SIMULADO = false;
+const API = "http://localhost:5027";
+
+// Funções simuladas
+async function mockRequest(endpoint) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      if (endpoint.startsWith("/login")) resolve("Login bem-sucedido (SIMULADO)");
+      if (endpoint === "/saldo") resolve("Saldo: R$ 1.250,00 (SIMULADO)");
+      if (endpoint.startsWith("/sacar")) resolve("Saque realizado (SIMULADO)");
+    }, 600);
+  });
+}
+
+async function login() {
+  const pin = document.getElementById("pin").value;
+
+  try {
+    const res = MODO_SIMULADO
+      ? await mockRequest(`/login?pin=${pin}`)
+      : await (await fetch(`${API}/login?pin=${pin}`)).text();
+
+    document.getElementById("loginResultado").innerText = res;
+  } catch (e) {
+    document.getElementById("loginResultado").innerText = "Erro ao conectar à API";
+  }
+}
+
+async function consultarSaldo() {
+  try {
+    const res = MODO_SIMULADO
+      ? await mockRequest("/saldo")
+      : await (await fetch(`${API}/saldo`)).text();
+
+    document.getElementById("saldoResultado").innerText = res;
+  } catch (e) {
+    document.getElementById("saldoResultado").innerText = "Erro ao conectar à API";
+  }
+}
+
+async function sacar() {
+  const valor = document.getElementById("valorSaque").value;
+
+  try {
+    const res = MODO_SIMULADO
+      ? await mockRequest(`/sacar/${valor}`)
+      : await (await fetch(`${API}/sacar/${valor}`, { method: "POST" })).text();
+
+    document.getElementById("saqueResultado").innerText = res;
+  } catch (e) {
+    document.getElementById("saqueResultado").innerText = "Erro ao conectar à API";
+  }
+}
+</script>
+
+</body>
+</html>
